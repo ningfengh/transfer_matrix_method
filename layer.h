@@ -3,11 +3,9 @@
 #include <complex>
 using namespace std;
 class layer {
-		double n;
-		double k;
+	friend class simulation;
+		int idx;
 		double thickness;
-		complex<double> tmm_s[2][2];
-		complex<double> tmm_p[2][2];
 	public:
 		layer(int,double);
 };

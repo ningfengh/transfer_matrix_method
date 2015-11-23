@@ -11,10 +11,12 @@ enum material_type {
 };
 
 class material {
+	    friend class simulation;
 		vector <double> raw_wav;
 		vector <double> raw_n;
 		vector <double> raw_k;
 		material_type type;
+		string file;
 	public:
 		material(string);
 		double get_n(double);

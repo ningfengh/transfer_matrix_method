@@ -3,6 +3,7 @@
 material::material(string filename){
 	ifstream material_in(filename.c_str());
 	type = Tabulated;
+	file = filename;
 	if (material_in.is_open()) {
 		while (!material_in.eof())
 		{
