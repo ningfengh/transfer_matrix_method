@@ -9,6 +9,7 @@
 #include "material.h"
 using namespace std;
 class simulation{
+	protected:	
 		double wav_begin;
 		double wav_end;
 		double npoint;
