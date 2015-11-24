@@ -1,6 +1,6 @@
 #include "simulation.h"
 
-simulation::simulation(string filename)
+simulation::simulation(string filename)   // constructor from the control file
 {
 	ifstream m_file (filename.c_str());
 	int n_material, n_layer;
@@ -40,9 +40,7 @@ simulation::simulation(string filename)
 			layer_data.push_back(temp);
 			cout<<"layer "<<i+1<< " has the thickness of "<<thickness<<" nm and use the material data in "
 			<<material_data[idx-1]->file<<endl;
-			
 		}
-
 		m_file.close();
 	}
 	else {cout<<"Unable to open main control file ALL.IN"<<endl;}	
