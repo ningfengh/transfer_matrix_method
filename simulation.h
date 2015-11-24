@@ -9,7 +9,6 @@
 #include "material.h"
 using namespace std;
 class simulation{
-	friend class ellipsomtry;
 		double wav_begin;
 		double wav_end;
 		double npoint;

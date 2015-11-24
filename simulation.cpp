@@ -68,7 +68,7 @@ void simulation::get_ref_trans(string filename, char s)
 		for (int wav_idx=0;wav_idx<npoint;wav_idx++)
 		{
 			/* calculate the first layer matrix */
-			n1 = complex<double>(material_data[layer_data[0]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[0]->idx]->get_k(wav_vector[wav_idx]));
+			n1 = material_data[layer_data[0]->idx]->get_nk(wav_vector[wav_idx]);
 			theta1 = asin(n0*sin(theta0)/n1);
 			rs = (n0*cos(theta0)-n1*cos(theta1))/(n0*cos(theta0)+n1*cos(theta1));
 			ts = (2.0*n0*cos(theta0))/(n0*cos(theta0)+n1*cos(theta1));
@@ -79,8 +79,8 @@ void simulation::get_ref_trans(string filename, char s)
 			/* calculate the middle layers */
 			for (int layer_idx = 0;layer_idx<nlayer-1;layer_idx++)
 			{
-				n1 = complex <double>(material_data[layer_data[layer_idx]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx]->idx]->get_k(wav_vector[wav_idx]));
-				n2 = complex <double>(material_data[layer_data[layer_idx+1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx+1]->idx]->get_k(wav_vector[wav_idx]));
+				n1 = material_data[layer_data[layer_idx]->idx]->get_nk(wav_vector[wav_idx]);
+				n2 = material_data[layer_data[layer_idx+1]->idx]->get_nk(wav_vector[wav_idx]);
 				theta1 = asin(n0*sin(theta0)/n1);
 				theta2 = asin(n0*sin(theta0)/n2);
 				delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[layer_idx]->thickness;		
@@ -101,7 +101,7 @@ void simulation::get_ref_trans(string filename, char s)
 		
 			/* calculate last layer */
 		
-			n1 = complex <double>(material_data[layer_data[nlayer-1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[nlayer-1]->idx]->get_k(wav_vector[wav_idx]));
+			n1 = material_data[layer_data[nlayer-1]->idx]->get_nk(wav_vector[wav_idx]);
 			theta1 = asin(n0*sin(theta0)/n1);
 			complex <double> delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[nlayer-1]->thickness;		
 			rs = (n1*cos(theta1)-n0*cos(theta0))/(n1*cos(theta1)+n0*cos(theta0));
@@ -125,7 +125,7 @@ void simulation::get_ref_trans(string filename, char s)
 		for (int wav_idx=0;wav_idx<npoint;wav_idx++)
 		{
 			/* calculate the first layer matrix */
-			n1 = complex<double>(material_data[layer_data[0]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[0]->idx]->get_k(wav_vector[wav_idx]));
+			n1 = material_data[layer_data[0]->idx]->get_nk(wav_vector[wav_idx]);
 			theta1 = asin(n0*sin(theta0)/n1);
 			rs = (n1*cos(theta0)-n0*cos(theta1))/(n1*cos(theta0)+n0*cos(theta1));
 			ts = (2.0*n0*cos(theta0))/(n1*cos(theta0)+n0*cos(theta1));
@@ -136,8 +136,8 @@ void simulation::get_ref_trans(string filename, char s)
 			/* calculate the middle layers */
 			for (int layer_idx = 0;layer_idx<nlayer-1;layer_idx++)
 			{
-				n1 = complex <double>(material_data[layer_data[layer_idx]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx]->idx]->get_k(wav_vector[wav_idx]));
-				n2 = complex <double>(material_data[layer_data[layer_idx+1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx+1]->idx]->get_k(wav_vector[wav_idx]));
+				n1 = material_data[layer_data[layer_idx]->idx]->get_nk(wav_vector[wav_idx]);
+				n2 = material_data[layer_data[layer_idx+1]->idx]->get_nk(wav_vector[wav_idx]);
 				theta1 = asin(n0*sin(theta0)/n1);
 				theta2 = asin(n0*sin(theta0)/n2);
 				delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[layer_idx]->thickness;		
@@ -158,7 +158,7 @@ void simulation::get_ref_trans(string filename, char s)
 		
 			/* calculate last layer */
 		
-			n1 = complex <double>(material_data[layer_data[nlayer-1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[nlayer-1]->idx]->get_k(wav_vector[wav_idx]));
+			n1 = material_data[layer_data[nlayer-1]->idx]->get_nk(wav_vector[wav_idx]);
 			theta1 = asin(n0*sin(theta0)/n1);
 			complex <double> delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[nlayer-1]->thickness;		
 			rs = (n1*cos(theta1)-n0*cos(theta0))/(n1*cos(theta1)+n0*cos(theta0));
