@@ -48,7 +48,7 @@ simulation::simulation(string filename)
 	else {cout<<"Unable to open main control file ALL.IN"<<endl;}	
 }
 
-void simulation::get_ref_trans(string filename)
+void simulation::get_ref_trans(string filename, char s)
 {
 	if (layer_data.size()<1) {cout<<"please add more than one layer"<<endl;return;}
 	complex	<double> theta0 (aoi*M_PI/180.0,0.0);
@@ -65,60 +65,121 @@ void simulation::get_ref_trans(string filename)
 	int nlayer = layer_data.size();
 	ofstream myfile (filename.c_str());
 	
-	for (int wav_idx=0;wav_idx<npoint;wav_idx++)
-	{
-		/* calculate the first layer matrix */
-		n1 = complex<double>(material_data[layer_data[0]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[0]->idx]->get_k(wav_vector[wav_idx]));
-		theta1 = asin(n0*sin(theta0)/n1);
-		rs = (n0*cos(theta0)-n1*cos(theta1))/(n0*cos(theta0)+n1*cos(theta1));
-		ts = (2.0*n0*cos(theta0))/(n0*cos(theta0)+n1*cos(theta1));
-		M[0][0] = 1.0/ts; M[0][1] = rs/ts;
-		M[1][0] = rs/ts;  M[1][1] = 1.0/ts;    
-		
-		
-		/* calculate the middle layers */
-		for (int layer_idx = 0;layer_idx<nlayer-1;layer_idx++)
+	if (s=='s'){
+	
+		for (int wav_idx=0;wav_idx<npoint;wav_idx++)
 		{
-			n1 = complex <double>(material_data[layer_data[layer_idx]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx]->idx]->get_k(wav_vector[wav_idx]));
-			n2 = complex <double>(material_data[layer_data[layer_idx+1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx+1]->idx]->get_k(wav_vector[wav_idx]));
+			/* calculate the first layer matrix */
+			n1 = complex<double>(material_data[layer_data[0]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[0]->idx]->get_k(wav_vector[wav_idx]));
 			theta1 = asin(n0*sin(theta0)/n1);
-			theta2 = asin(n0*sin(theta0)/n2);
-			delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[layer_idx]->thickness;		
-			rs = (n1*cos(theta1)-n2*cos(theta2))/(n1*cos(theta1)+n2*cos(theta2));
-			ts = (2.0*n1*cos(theta1))/(n1*cos(theta1)+n2*cos(theta2));
+			rs = (n0*cos(theta0)-n1*cos(theta1))/(n0*cos(theta0)+n1*cos(theta1));
+			ts = (2.0*n0*cos(theta0))/(n0*cos(theta0)+n1*cos(theta1));
+			M[0][0] = 1.0/ts; M[0][1] = rs/ts;
+			M[1][0] = rs/ts;  M[1][1] = 1.0/ts;    
+		
+		
+			/* calculate the middle layers */
+			for (int layer_idx = 0;layer_idx<nlayer-1;layer_idx++)
+			{
+				n1 = complex <double>(material_data[layer_data[layer_idx]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx]->idx]->get_k(wav_vector[wav_idx]));
+				n2 = complex <double>(material_data[layer_data[layer_idx+1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx+1]->idx]->get_k(wav_vector[wav_idx]));
+				theta1 = asin(n0*sin(theta0)/n1);
+				theta2 = asin(n0*sin(theta0)/n2);
+				delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[layer_idx]->thickness;		
+				rs = (n1*cos(theta1)-n2*cos(theta2))/(n1*cos(theta1)+n2*cos(theta2));
+				ts = (2.0*n1*cos(theta1))/(n1*cos(theta1)+n2*cos(theta2));
 			
+				tmp[0][0] = M[0][0]*exp(-EYE*delta)/ts+M[0][1]*exp(EYE*delta)*rs/ts;
+				tmp[0][1] = M[0][0]*exp(-EYE*delta)*rs/ts+M[0][1]*exp(EYE*delta)/ts;
+				tmp[1][0] = M[1][0]*exp(-EYE*delta)/ts+M[1][1]*exp(EYE*delta)*rs/ts;
+				tmp[1][1] = M[1][0]*exp(-EYE*delta)*rs/ts+M[1][1]*exp(EYE*delta)/ts;
+			
+				M[0][0] = tmp[0][0];
+				M[0][1] = tmp[0][1];
+				M[1][0] = tmp[1][0];
+				M[1][1] = tmp[1][1];
+				
+			}	
+		
+			/* calculate last layer */
+		
+			n1 = complex <double>(material_data[layer_data[nlayer-1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[nlayer-1]->idx]->get_k(wav_vector[wav_idx]));
+			theta1 = asin(n0*sin(theta0)/n1);
+			complex <double> delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[nlayer-1]->thickness;		
+			rs = (n1*cos(theta1)-n0*cos(theta0))/(n1*cos(theta1)+n0*cos(theta0));
+			ts = (2.0*n1*cos(theta1))/(n1*cos(theta1)+n0*cos(theta0));
+		
 			tmp[0][0] = M[0][0]*exp(-EYE*delta)/ts+M[0][1]*exp(EYE*delta)*rs/ts;
 			tmp[0][1] = M[0][0]*exp(-EYE*delta)*rs/ts+M[0][1]*exp(EYE*delta)/ts;
 			tmp[1][0] = M[1][0]*exp(-EYE*delta)/ts+M[1][1]*exp(EYE*delta)*rs/ts;
 			tmp[1][1] = M[1][0]*exp(-EYE*delta)*rs/ts+M[1][1]*exp(EYE*delta)/ts;
-			
-			M[0][0] = tmp[0][0];
-			M[0][1] = tmp[0][1];
-			M[1][0] = tmp[1][0];
-			M[1][1] = tmp[1][1];
-				
+		
+			ref = tmp[1][0]/tmp[0][0];
+			trans = 1.0/tmp[0][0];
+		
+			ref_vector_s.push_back(ref);
+			trans_vector_s.push_back(trans);
+		
+			myfile<<wav_vector[wav_idx]<<"\t"<<norm(ref)<<"\t"<<norm(trans)<<endl;
 		}
-		
-		/* calculate last layer */
-		
-		n1 = complex <double>(material_data[layer_data[nlayer-1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[nlayer-1]->idx]->get_k(wav_vector[wav_idx]));
-		theta1 = asin(n0*sin(theta0)/n1);
-		complex <double> delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[nlayer-1]->thickness;		
-		rs = (n1*cos(theta1)-n0*cos(theta0))/(n1*cos(theta1)+n0*cos(theta0));
-		ts = (2.0*n1*cos(theta1))/(n1*cos(theta1)+n0*cos(theta0));
-		
-		tmp[0][0] = M[0][0]*exp(-EYE*delta)/ts+M[0][1]*exp(EYE*delta)*rs/ts;
-		tmp[0][1] = M[0][0]*exp(-EYE*delta)*rs/ts+M[0][1]*exp(EYE*delta)/ts;
-		tmp[1][0] = M[1][0]*exp(-EYE*delta)/ts+M[1][1]*exp(EYE*delta)*rs/ts;
-		tmp[1][1] = M[1][0]*exp(-EYE*delta)*rs/ts+M[1][1]*exp(EYE*delta)/ts;
-		
-		ref = tmp[1][0]/tmp[0][0];
-		trans = 1.0/tmp[0][0];
-		
-		ref_vector.push_back(norm(ref));
-		trans_vector.push_back(norm(trans));
-		
-		myfile<<wav_vector[wav_idx]<<"\t"<<norm(ref)<<"\t"<<norm(trans)<<endl;
 	}
+	else if (s=='p'){
+		for (int wav_idx=0;wav_idx<npoint;wav_idx++)
+		{
+			/* calculate the first layer matrix */
+			n1 = complex<double>(material_data[layer_data[0]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[0]->idx]->get_k(wav_vector[wav_idx]));
+			theta1 = asin(n0*sin(theta0)/n1);
+			rs = (n1*cos(theta0)-n0*cos(theta1))/(n1*cos(theta0)+n0*cos(theta1));
+			ts = (2.0*n0*cos(theta0))/(n1*cos(theta0)+n0*cos(theta1));
+			M[0][0] = 1.0/ts; M[0][1] = rs/ts;
+			M[1][0] = rs/ts;  M[1][1] = 1.0/ts;    
+		
+		
+			/* calculate the middle layers */
+			for (int layer_idx = 0;layer_idx<nlayer-1;layer_idx++)
+			{
+				n1 = complex <double>(material_data[layer_data[layer_idx]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx]->idx]->get_k(wav_vector[wav_idx]));
+				n2 = complex <double>(material_data[layer_data[layer_idx+1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[layer_idx+1]->idx]->get_k(wav_vector[wav_idx]));
+				theta1 = asin(n0*sin(theta0)/n1);
+				theta2 = asin(n0*sin(theta0)/n2);
+				delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[layer_idx]->thickness;		
+				rs = (n2*cos(theta1)-n1*cos(theta2))/(n2*cos(theta1)+n1*cos(theta2));
+				ts = (2.0*n1*cos(theta1))/(n2*cos(theta1)+n1*cos(theta2));
+			
+				tmp[0][0] = M[0][0]*exp(-EYE*delta)/ts+M[0][1]*exp(EYE*delta)*rs/ts;
+				tmp[0][1] = M[0][0]*exp(-EYE*delta)*rs/ts+M[0][1]*exp(EYE*delta)/ts;
+				tmp[1][0] = M[1][0]*exp(-EYE*delta)/ts+M[1][1]*exp(EYE*delta)*rs/ts;
+				tmp[1][1] = M[1][0]*exp(-EYE*delta)*rs/ts+M[1][1]*exp(EYE*delta)/ts;
+			
+				M[0][0] = tmp[0][0];
+				M[0][1] = tmp[0][1];
+				M[1][0] = tmp[1][0];
+				M[1][1] = tmp[1][1];
+				
+			}	
+		
+			/* calculate last layer */
+		
+			n1 = complex <double>(material_data[layer_data[nlayer-1]->idx]->get_n(wav_vector[wav_idx]),material_data[layer_data[nlayer-1]->idx]->get_k(wav_vector[wav_idx]));
+			theta1 = asin(n0*sin(theta0)/n1);
+			complex <double> delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[nlayer-1]->thickness;		
+			rs = (n1*cos(theta1)-n0*cos(theta0))/(n1*cos(theta1)+n0*cos(theta0));
+			ts = (2.0*n1*cos(theta1))/(n1*cos(theta1)+n0*cos(theta0));
+		
+			tmp[0][0] = M[0][0]*exp(-EYE*delta)/ts+M[0][1]*exp(EYE*delta)*rs/ts;
+			tmp[0][1] = M[0][0]*exp(-EYE*delta)*rs/ts+M[0][1]*exp(EYE*delta)/ts;
+			tmp[1][0] = M[1][0]*exp(-EYE*delta)/ts+M[1][1]*exp(EYE*delta)*rs/ts;
+			tmp[1][1] = M[1][0]*exp(-EYE*delta)*rs/ts+M[1][1]*exp(EYE*delta)/ts;
+		
+			ref = tmp[1][0]/tmp[0][0];
+			trans = 1.0/tmp[0][0];
+		
+			ref_vector_p.push_back(ref);
+			trans_vector_p.push_back(trans);
+		
+			myfile<<wav_vector[wav_idx]<<"\t"<<norm(ref)<<"\t"<<norm(trans)<<endl;
+		}		
+	}
+	else cout<<"Please select the correct polarization"<<endl;
 	myfile.close();
 }

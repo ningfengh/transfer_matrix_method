@@ -15,13 +15,15 @@ class simulation{
 		double npoint;
 		double aoi;
 		vector<double> 	wav_vector;
-		vector<double> 	ref_vector;
-		vector<double> 	trans_vector;
+		vector<complex<double>>	ref_vector_s;
+		vector<complex<double>>	trans_vector_s;
+		vector<complex<double>>	ref_vector_p;
+		vector<complex<double>>	trans_vector_p;		
 		vector<material*> material_data;
 		vector<layer*>	layer_data;
 	public:
 		simulation(string); // filename
-		void get_ref_trans(string);
+		void get_ref_trans(string,char);
 	
 };
 
