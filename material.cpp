@@ -54,6 +54,7 @@ material::material(string filename){
 				material_in>>wav;
 				material_in>>n;
 				material_in>>k;
+				
 				raw_wav.push_back(wav);
 			//[to do], decide whether wav is monotonically increase
 				raw_n.push_back(n);
@@ -117,7 +118,7 @@ complex<double> material::get_nk(double wav_in){
 			int begin = 0, end = raw_wav.size()-1;
 			int mid = (begin+end)/2;
 			while (begin<end-1){			
-				if (wav_in == raw_wav[mid]) return raw_n[mid];
+				if (wav_in == raw_wav[mid]) return complex<double>(raw_n[mid],raw_k[mid]);
 				else if (wav_in>raw_wav[mid]) {begin = mid;mid = (begin+end)/2;}
 				else {end = mid;mid=(begin+end)/2;}
 			}

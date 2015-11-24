@@ -126,6 +126,7 @@ void simulation::get_ref_trans(string filename, char s)
 		{
 			/* calculate the first layer matrix */
 			n1 = material_data[layer_data[0]->idx]->get_nk(wav_vector[wav_idx]);
+			
 			theta1 = asin(n0*sin(theta0)/n1);
 			rs = (n1*cos(theta0)-n0*cos(theta1))/(n1*cos(theta0)+n0*cos(theta1));
 			ts = (2.0*n0*cos(theta0))/(n1*cos(theta0)+n0*cos(theta1));
