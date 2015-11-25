@@ -38,7 +38,7 @@ class material {
 		string file;
 	public:
 		material(string); //constructor from a control file
-		set_parameter(int,vector<double>&); // first argument is the idx of the model
+		//set_parameter(int,vector<double>&); // first argument is the idx of the model
 		complex<double> get_nk(double);		
 };
 #endif
