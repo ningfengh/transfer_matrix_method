@@ -7,6 +7,12 @@
 //#include "simulation.h"
 using namespace std;
 
+double wrapper(const std::vector<double> &x, std::vector<double> &grad, void *o) {
+	return reinterpret_cast<ellipsometry*>(o)->myfunc(x, grad, o);
+}
+
+
+
 int main(int nNumberofArgs, char* pszArgs[])
 {
 	string simulation_type;
@@ -32,7 +38,14 @@ int main(int nNumberofArgs, char* pszArgs[])
 	else if(simulation_type=="Fitting")
 	{
 		ellipsometry mysimulation(m_file);
-		mysimulation.fitting();
+		vector<double> x(1,1.4785);
+		vector<double> grad;
+		for (double t=1;t<2;t+=0.01)
+		{
+			x[0] =t;
+			cout<<t<<" "<<wrapper(x, grad, &mysimulation)<<endl;
+		}
+		//mysimulation.fitting();
 		//mysimulation.get_ref_trans("./output/spec_s.txt",'s');
 		//mysimulation.get_ref_trans("./output/spec_p.txt",'p');
 		//mysimulation.get_psi_delta("./output/psi_delta.txt");

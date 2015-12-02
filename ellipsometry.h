@@ -51,12 +51,12 @@ class ellipsometry {
 		vector <DOF*> fitting_parameters;	// fitting parameters
 		double get_error(void);			// get MSE between raw data and fitting data
 		vector <double> parameters;
-		double myfunc(const std::vector<double> &, std::vector<double> &, void *);
+		
 		void delinearize_parameter();
 
 	public:
 		ellipsometry (ifstream&);
-		
+		double myfunc(const std::vector<double> &, std::vector<double> &, void*);
 		void fitting();
 		
 		
