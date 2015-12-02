@@ -10,7 +10,7 @@ class simulation_ellip:public simulation{
 	public:
 		void get_psi_delta(void);	
 		void get_psi_delta(string);
-		simulation_ellip(string,double);
+		simulation_ellip(ifstream&,double);
 };
 
 class ellipsomtry {

@@ -1,33 +1,37 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-
+#include <cstdio>
+#include <cstdlib>
 #include "ellipsometry.h"
 //#include "simulation.h"
 using namespace std;
 
-int main(void)
+int main(int nNumberofArgs, char* pszArgs[])
 {
+	string simulation_type;
+	if (nNumberofArgs!=2) {cout<<"Please specify the control file..."<<endl;exit(1);}
+	ifstream m_file (pszArgs[1]);
+	if(!m_file.is_open()) {cout<<"Error: cannot open the control file..."<<endl;exit(1);}
+
 	
-	// TEST TRANSMISSION AND REFLECTION
-	/*
-	simulation mysimulation("ALL.IN");
-	mysimulation.get_ref_trans("myout_s.txt",'s');
-	mysimulation.get_ref_trans("myout_p.txt",'p');
-	return 1;
-	*/
-/*
-	material mymaterial("TCO_fit.txt");
-	
-	for (double wav=300;wav<1000;wav+=0.1)
+	m_file>>simulation_type;
+	if (simulation_type=="Spec")
 	{
-		cout<<wav<<"\t"<<real(mymaterial.get_nk(wav))<<"\t"<<imag(mymaterial.get_nk(wav))<<endl;
+		simulation mysimulation(m_file);
+		mysimulation.get_ref_trans("./output/spec_s.txt",'s');
+		mysimulation.get_ref_trans("./output/spec_p.txt",'p');
 	}
-	*/
+	else if(simulation_type=="Ellip")
+	{
+		simulation_ellip mysimulation(m_file,55);
+		mysimulation.get_ref_trans("./output/spec_s.txt",'s');
+		mysimulation.get_ref_trans("./output/spec_p.txt",'p');
+		mysimulation.get_psi_delta("./output/psi_delta.txt");
+	}	
+	return 1;
+
 	
-	simulation_ellip mysimulation("ALL2.IN",55);
-	mysimulation.get_ref_trans("myout_s.txt",'s');
-	mysimulation.get_ref_trans("myout_p.txt",'p');
-	mysimulation.get_psi_delta("psi_delta.txt");
+	m_file.close();
 
 }

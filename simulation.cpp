@@ -1,61 +1,55 @@
 #include "simulation.h"
 
-simulation::simulation(string filename)   // constructor from the control file
+simulation::simulation(ifstream &m_file)   // constructor from the control file
 {
-	ifstream m_file (filename.c_str());
 	int n_material, n_layer;
 	double wav_begin,wav_end,npoint,aoi;
 	
 	string datafilename;
 	
-	if(m_file.is_open())
+	m_file>>wav_begin>>wav_end>>npoint;
+	this->wav_begin = wav_begin;
+	this->wav_end = wav_end;
+	this->npoint = npoint;
+	m_file>>aoi;
+	this->aoi = aoi;
+	for (int i=0;i<npoint;i++)
 	{
-
-		m_file>>wav_begin>>wav_end>>npoint;
-		this->wav_begin = wav_begin;
-		this->wav_end = wav_end;
-		this->npoint = npoint;
-		m_file>>aoi;
-		this->aoi = aoi;
-		for (int i=0;i<npoint;i++)
-		{
-			wav_vector.push_back(wav_begin+(wav_end-wav_begin)/(npoint-1)*i);
-		}
+		wav_vector.push_back(wav_begin+(wav_end-wav_begin)/(npoint-1)*i);
+	}
 		
-//              Read material files
+//      Read material files
+	m_file>>n_material;
+	cout<<"number of materials is: "<<n_material<<endl;
+	for (int i=0;i<n_material;i++)
+	{
+		m_file>>datafilename;
+		material* temp=new material(datafilename); // class material constructer takes filename as an input
+		material_data.push_back(temp);
+	}
 
-		m_file>>n_material;
-		cout<<"number of materials is: "<<n_material<<endl;
-		for (int i=0;i<n_material;i++)
-		{
-			m_file>>datafilename;
-			material* temp=new material(datafilename); // class material constructer takes filename as an input
-			material_data.push_back(temp);
-		}
+//      Read layers info, the last layer is always semi-infinite substrate layer
 
-//              Read layers info, the last layer is always semi-infinite substrate layer
-
-		m_file>>n_layer;
-		cout<<endl<<endl<<"number of layer is: "<<n_layer<<endl;
-		for (int i=0;i<n_layer-1;i++)
-		{
-			double idx,thickness;
-			m_file>>idx>>thickness;
-			layer* temp = new layer(idx,thickness);  // idx is material indice, thickness is the only parameter for each layer
-			layer_data.push_back(temp);
-			cout<<"layer "<<i+1<< " has the thickness of "<<thickness<<" nm and use the material data in "
-			<<material_data[idx-1]->file<<endl;
-		}
+	m_file>>n_layer;
+	cout<<endl<<endl<<"number of layer is: "<<n_layer<<endl;
+	for (int i=0;i<n_layer-1;i++)
+	{
 		double idx,thickness;
 		m_file>>idx>>thickness;
-		if (thickness!=-1) {cout<<"last layer is semi-infinite, put thickness as -1\n"<<endl;exit(1);}
-		layer* temp = new layer(idx,thickness);
+		layer* temp = new layer(idx,thickness);  // idx is material indice, thickness is the only parameter for each layer
 		layer_data.push_back(temp);
-		cout<<"layer "<<n_layer<< " is semi-infinite substrate and use the material data in "
+		cout<<"layer "<<i+1<< " has the thickness of "<<thickness<<" nm and use the material data in "
 		<<material_data[idx-1]->file<<endl;
-		m_file.close();
 	}
-	else {cout<<"Unable to open main control file ALL.IN"<<endl;}	
+	double idx,thickness;
+	m_file>>idx>>thickness;
+	if (thickness!=-1) {cout<<"last layer is semi-infinite, put thickness as -1\n"<<endl;exit(1);}
+	layer* temp = new layer(idx,thickness);
+	layer_data.push_back(temp);
+	cout<<"layer "<<n_layer<< " is semi-infinite substrate and use the material data in "
+	<<material_data[idx-1]->file<<endl;
+	m_file.close();
+
 }
 
 void simulation::get_ref_trans(string filename, char s)  // always have the last semi-infinite substrate layer

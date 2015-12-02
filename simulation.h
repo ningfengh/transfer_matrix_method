@@ -22,7 +22,7 @@ class simulation{
 		vector<material*> material_data;
 		vector<layer*>	layer_data;
 	public:
-		simulation(string); // filename
+		simulation(ifstream&); // filename
 		void get_ref_trans(string,char);
 		void get_abs(string,char);
 };

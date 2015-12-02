@@ -1,7 +1,7 @@
 #include "ellipsometry.h"
 
 
-simulation_ellip::simulation_ellip(string filename, double aoi):simulation(filename){
+simulation_ellip::simulation_ellip(ifstream &m_file, double aoi):simulation(m_file){
 	this->aoi = aoi;
 }
 
