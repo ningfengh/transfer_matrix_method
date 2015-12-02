@@ -25,7 +25,7 @@ int main(void)
 	}
 	*/
 	
-	simulation_ellip mysimulation("ALL2.IN",75);
+	simulation_ellip mysimulation("ALL2.IN",55);
 	mysimulation.get_ref_trans("myout_s.txt",'s');
 	mysimulation.get_ref_trans("myout_p.txt",'p');
 	mysimulation.get_psi_delta("psi_delta.txt");
