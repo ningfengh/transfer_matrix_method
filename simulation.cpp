@@ -44,17 +44,22 @@ simulation::simulation(ifstream &m_file)   // constructor from the control file
 		cout<<"layer "<<i+1<< " has the thickness of "<<thickness<<" nm and use the material data in "
 		<<material_data[idx-1]->file<<endl;
 	}
-	double idx,thickness;
-	m_file>>idx>>thickness;
+	int idx;
+	double thickness;
+	int variable;
+	m_file>>idx>>thickness>>variable;;
 	if (thickness!=-1) {cout<<"last layer is semi-infinite, put thickness as -1\n"<<endl;exit(1);}
 	layer* temp = new layer(idx,thickness,0);
 	layer_data.push_back(temp);
 	cout<<"layer "<<n_layer<< " is semi-infinite substrate and use the material data in "
 	<<material_data[idx-1]->file<<endl;
-	m_file.close();
+	
 
 }
 
+simulation::simulation(void){
+}
+ 
 void simulation::get_ref_trans(string filename, char s)  // always have the last semi-infinite substrate layer
 {
 	if (layer_data.size()<1) {cout<<"please add more than one layer"<<endl;return;}
@@ -167,3 +172,132 @@ void simulation::get_ref_trans(string filename, char s)  // always have the last
 	else cout<<"Please select the correct polarization"<<endl;
 	myfile.close();
 }
+
+
+void simulation::get_ref_trans(char s)  // always have the last semi-infinite substrate layer
+{
+	if (layer_data.size()<1) {cout<<"please add more than one layer"<<endl;return;}
+	complex	<double> theta0 (aoi*M_PI/180.0,0.0);
+	complex	<double> n0 (1.0,0.0);
+	complex	<double> M[2][2];
+	complex	<double> tmp[2][2];
+	complex <double> EYE (0,1);
+	complex <double> n1, n2;
+	complex <double> theta1, theta2;
+	complex <double> rs, ts;
+	complex <double> delta;
+	complex	<double> ref, trans;
+	
+	int nlayer = layer_data.size();
+	
+	
+	if (s=='s'){
+		ref_vector_s.clear();
+		trans_vector_s.clear();
+		for (int wav_idx=0;wav_idx<npoint;wav_idx++)
+		{
+			/* calculate the first layer matrix */
+			n1 = material_data[layer_data[0]->idx]->get_nk(wav_vector[wav_idx]);
+			theta1 = asin(n0*sin(theta0)/n1);
+			rs = (n0*cos(theta0)-n1*cos(theta1))/(n0*cos(theta0)+n1*cos(theta1));
+			ts = (2.0*n0*cos(theta0))/(n0*cos(theta0)+n1*cos(theta1));
+			M[0][0] = 1.0/ts; M[0][1] = rs/ts;
+			M[1][0] = rs/ts;  M[1][1] = 1.0/ts;    
+		
+		
+			/* calculate the middle layers */
+			for (int layer_idx = 0;layer_idx<nlayer-1;layer_idx++)
+			{
+				n1 = material_data[layer_data[layer_idx]->idx]->get_nk(wav_vector[wav_idx]);
+				n2 = material_data[layer_data[layer_idx+1]->idx]->get_nk(wav_vector[wav_idx]);
+				theta1 = asin(n0*sin(theta0)/n1);
+				theta2 = asin(n0*sin(theta0)/n2);
+				delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[layer_idx]->thickness;		
+				rs = (n1*cos(theta1)-n2*cos(theta2))/(n1*cos(theta1)+n2*cos(theta2));
+				ts = (2.0*n1*cos(theta1))/(n1*cos(theta1)+n2*cos(theta2));
+			
+				tmp[0][0] = M[0][0]*exp(-EYE*delta)/ts+M[0][1]*exp(EYE*delta)*rs/ts;
+				tmp[0][1] = M[0][0]*exp(-EYE*delta)*rs/ts+M[0][1]*exp(EYE*delta)/ts;
+				tmp[1][0] = M[1][0]*exp(-EYE*delta)/ts+M[1][1]*exp(EYE*delta)*rs/ts;
+				tmp[1][1] = M[1][0]*exp(-EYE*delta)*rs/ts+M[1][1]*exp(EYE*delta)/ts;
+			
+				M[0][0] = tmp[0][0];
+				M[0][1] = tmp[0][1];
+				M[1][0] = tmp[1][0];
+				M[1][1] = tmp[1][1];
+				
+			}	
+		
+					
+			ref = M[1][0]/M[0][0];
+			trans = 1.0/M[0][0];
+		
+			ref_vector_s.push_back(ref);
+			trans_vector_s.push_back(trans);
+		
+			
+		}
+	}
+	else if (s=='p'){
+		ref_vector_p.clear();
+		trans_vector_p.clear();
+		for (int wav_idx=0;wav_idx<npoint;wav_idx++)
+		{
+			/* calculate the first layer matrix */
+			n1 = material_data[layer_data[0]->idx]->get_nk(wav_vector[wav_idx]);
+			
+			theta1 = asin(n0*sin(theta0)/n1);
+			rs = (n1*cos(theta0)-n0*cos(theta1))/(n1*cos(theta0)+n0*cos(theta1));
+			ts = (2.0*n0*cos(theta0))/(n1*cos(theta0)+n0*cos(theta1));
+			M[0][0] = 1.0/ts; M[0][1] = rs/ts;
+			M[1][0] = rs/ts;  M[1][1] = 1.0/ts;    
+		
+		
+			/* calculate the middle layers */
+			for (int layer_idx = 0;layer_idx<nlayer-1;layer_idx++)
+			{
+				n1 = material_data[layer_data[layer_idx]->idx]->get_nk(wav_vector[wav_idx]);
+				n2 = material_data[layer_data[layer_idx+1]->idx]->get_nk(wav_vector[wav_idx]);
+				theta1 = asin(n0*sin(theta0)/n1);
+				theta2 = asin(n0*sin(theta0)/n2);
+				delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[layer_idx]->thickness;		
+				rs = (n2*cos(theta1)-n1*cos(theta2))/(n2*cos(theta1)+n1*cos(theta2));
+				ts = (2.0*n1*cos(theta1))/(n2*cos(theta1)+n1*cos(theta2));
+			
+				tmp[0][0] = M[0][0]*exp(-EYE*delta)/ts+M[0][1]*exp(EYE*delta)*rs/ts;
+				tmp[0][1] = M[0][0]*exp(-EYE*delta)*rs/ts+M[0][1]*exp(EYE*delta)/ts;
+				tmp[1][0] = M[1][0]*exp(-EYE*delta)/ts+M[1][1]*exp(EYE*delta)*rs/ts;
+				tmp[1][1] = M[1][0]*exp(-EYE*delta)*rs/ts+M[1][1]*exp(EYE*delta)/ts;
+			
+				M[0][0] = tmp[0][0];
+				M[0][1] = tmp[0][1];
+				M[1][0] = tmp[1][0];
+				M[1][1] = tmp[1][1];
+				
+			}	
+		
+					
+			ref = M[1][0]/M[0][0];
+			trans = 1.0/M[0][0];
+		
+			ref_vector_p.push_back(ref);
+			trans_vector_p.push_back(trans);
+		
+			
+		}		
+	}
+	else cout<<"Please select the correct polarization"<<endl;
+	
+}
+
+void simulation::override_wav(int npoint,vector<double> wav_vector){
+	this->npoint = npoint;
+	this->wav_vector = wav_vector;
+}
+
+void simulation::override_aoi(double aoi){
+	this->aoi = aoi;
+}
+
+
+

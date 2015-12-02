@@ -24,11 +24,19 @@ int main(int nNumberofArgs, char* pszArgs[])
 	}
 	else if(simulation_type=="Ellip")
 	{
-		simulation_ellip mysimulation(m_file,55);
+		simulation_ellip mysimulation(m_file);
 		mysimulation.get_ref_trans("./output/spec_s.txt",'s');
 		mysimulation.get_ref_trans("./output/spec_p.txt",'p');
 		mysimulation.get_psi_delta("./output/psi_delta.txt");
-	}	
+	}
+	else if(simulation_type=="Fitting")
+	{
+		ellipsometry mysimulation(m_file);
+		mysimulation.fitting();
+		//mysimulation.get_ref_trans("./output/spec_s.txt",'s');
+		//mysimulation.get_ref_trans("./output/spec_p.txt",'p');
+		//mysimulation.get_psi_delta("./output/psi_delta.txt");
+	}		
 	return 1;
 
 	

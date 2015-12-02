@@ -7,8 +7,12 @@
 #include <cmath>
 #include "layer.h"
 #include "material.h"
+
+
+
 using namespace std;
 class simulation{
+	friend class ellipsometry;
 	protected:	
 		double wav_begin;
 		double wav_end;
@@ -23,8 +27,12 @@ class simulation{
 		vector<layer*>	layer_data;
 	public:
 		simulation(ifstream&); // file pointer
+		simulation(void);
 		void get_ref_trans(string,char);
+		void get_ref_trans(char);
 		void get_abs(string,char);
+		void override_wav(int,vector<double>);
+		void override_aoi(double);
 };
 
 #endif //_SIMULATION_

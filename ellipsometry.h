@@ -18,34 +18,47 @@ class simulation_ellip:public simulation{
 	public:
 		void get_psi_delta(void);	
 		void get_psi_delta(string);
-		simulation_ellip(ifstream&,double);
+		simulation_ellip(ifstream&);
+		simulation_ellip(void);
 };
 
 
 
 class DOF {
-	 	vector<dof_type> type;
+	friend class ellipsometry;
+	 	dof_type type;
 		int idx;
-		int length;
-		vector<double> parameter_list;
+		vector<double> parameters;
+	public:
+		DOF(dof_type, int, vector<double>);
 };
 
 
 class raw_psi_delta {
 	friend class ellipsometry;
-		vector<double> wav;
+		vector<double> wav_vector;
 		vector<double> psi;
-		vector<double> delta;		
+		vector<double> delta;	
+		double aoi;	
+	public:
+		raw_psi_delta(string,double,double);
 };
 
-class ellipsomtry {
+class ellipsometry {
 // need to use the wavelength data in raw measurement file to overwrite wav_vector
 		vector <simulation_ellip*> fitted_data; // different angle fitting result
 		vector <raw_psi_delta*> raw_data;       // different angle raw data
 		vector <DOF*> fitting_parameters;	// fitting parameters
 		double get_error(void);			// get MSE between raw data and fitting data
+		vector <double> parameters;
+		double myfunc(const std::vector<double> &, std::vector<double> &, void *);
+		void delinearize_parameter();
+
 	public:
-		ellipsomtry (ifstream&);
+		ellipsometry (ifstream&);
+		
+		void fitting();
+		
 		
 };
 
