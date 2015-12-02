@@ -6,7 +6,8 @@ class layer {
 	friend class simulation;
 		int idx;
 		double thickness;
+		bool fitting;
 	public:
-		layer(int,double);
+		layer(int,double,int);
 };
 #endif //_LAYER_

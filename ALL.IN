@@ -2,10 +2,10 @@ Spec
 400	800	500
 40
 3
-AZO_nk.txt
-aSi_nk.txt
-Ag_nk.txt
+AZO_nk.txt	0
+aSi_nk.txt	0
+Ag_nk.txt	0
 3
-1	800
-2	550
-3	-1
+1	800	0	
+2	550	0
+3	-1	0

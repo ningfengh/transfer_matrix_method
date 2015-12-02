@@ -41,13 +41,15 @@ complex<double> material_model::get_nk(double wav_in)
         return 0;
 }
 
-material::material(string filename){
+material::material(string filename, int variable){
 	ifstream material_in(filename.c_str());
 	string material_type;
 	file = filename;
 	if (material_in.is_open()) {
 		material_in>>material_type;
 		if (material_type=="Table"){
+			if (variable==1) {cout<<"[Error] Tabulated material data cannot be variable..."<<endl;exit(1);}
+			fitting = false;
 			type = Tabulated;
 			double wav,n,k;		
 			while (material_in>>wav)
@@ -66,6 +68,7 @@ material::material(string filename){
 			material_in.close();
 		}
 		else if (material_type=="Model"){
+			if (variable==1) fitting = true; else fitting = false;			
 			type = Model;
 			while (!material_in.eof())
 			{
@@ -102,6 +105,7 @@ material::material(string filename){
 				
 			}
 		}
+		
 	}
 	else {
 		cout<<"Unable to open material file "<<filename<<endl;

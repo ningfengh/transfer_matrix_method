@@ -1,12 +1,14 @@
-Ellip
+Fitting
 300	1200	500
-40
+0
+2
+SiO2_fit.txt	1	
+Si_nk.txt	0
+2
+1	1	1
+2	-1	0
 3
-SiO2.txt
-Si_nk.txt
-w3.txt
-3
-3	442
-1	1.7
-2	-1
+sio2_pd_55.txt	55
+sio2_pd_65.txt	65
+sio2_pd_75.txt	75
 

@@ -23,8 +23,9 @@ simulation::simulation(ifstream &m_file)   // constructor from the control file
 	cout<<"number of materials is: "<<n_material<<endl;
 	for (int i=0;i<n_material;i++)
 	{
-		m_file>>datafilename;
-		material* temp=new material(datafilename); // class material constructer takes filename as an input
+		int variable;
+		m_file>>datafilename>>variable;
+		material* temp=new material(datafilename,variable); // class material constructer takes filename as an input
 		material_data.push_back(temp);
 	}
 
@@ -34,9 +35,11 @@ simulation::simulation(ifstream &m_file)   // constructor from the control file
 	cout<<endl<<endl<<"number of layer is: "<<n_layer<<endl;
 	for (int i=0;i<n_layer-1;i++)
 	{
-		double idx,thickness;
-		m_file>>idx>>thickness;
-		layer* temp = new layer(idx,thickness);  // idx is material indice, thickness is the only parameter for each layer
+		int idx;		
+		double thickness;
+		int variable;
+		m_file>>idx>>thickness>>variable;
+		layer* temp = new layer(idx,thickness,variable);  // idx is material indice, thickness is the only parameter for each layer
 		layer_data.push_back(temp);
 		cout<<"layer "<<i+1<< " has the thickness of "<<thickness<<" nm and use the material data in "
 		<<material_data[idx-1]->file<<endl;
@@ -44,7 +47,7 @@ simulation::simulation(ifstream &m_file)   // constructor from the control file
 	double idx,thickness;
 	m_file>>idx>>thickness;
 	if (thickness!=-1) {cout<<"last layer is semi-infinite, put thickness as -1\n"<<endl;exit(1);}
-	layer* temp = new layer(idx,thickness);
+	layer* temp = new layer(idx,thickness,0);
 	layer_data.push_back(temp);
 	cout<<"layer "<<n_layer<< " is semi-infinite substrate and use the material data in "
 	<<material_data[idx-1]->file<<endl;

@@ -34,3 +34,9 @@ void simulation_ellip::get_psi_delta(string filename){
 	}
 	myfile.close();
 }
+
+ellipsomtry::ellipsomtry(ifstream &m_file){
+	int n_material, n_layer;
+	double wav_begin,wav_end,npoint,aoi;
+	
+}
