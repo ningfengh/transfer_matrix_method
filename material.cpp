@@ -48,11 +48,11 @@ material::material(string filename){
 	if (material_in.is_open()) {
 		material_in>>material_type;
 		if (material_type=="Table"){
-			type = Tabulated;		
-			while (!material_in.eof())
-			{
-				double wav,n,k;
-				material_in>>wav;
+			type = Tabulated;
+			double wav,n,k;		
+			while (material_in>>wav)
+			{				
+				
 				material_in>>n;
 				material_in>>k;
 				

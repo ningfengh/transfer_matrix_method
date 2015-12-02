@@ -10,12 +10,12 @@ int main(void)
 {
 	
 	// TEST TRANSMISSION AND REFLECTION
-	
+	/*
 	simulation mysimulation("ALL.IN");
 	mysimulation.get_ref_trans("myout_s.txt",'s');
 	mysimulation.get_ref_trans("myout_p.txt",'p');
 	return 1;
-	
+	*/
 /*
 	material mymaterial("TCO_fit.txt");
 	
@@ -25,9 +25,9 @@ int main(void)
 	}
 	*/
 	
-	//simulation_ellip mysimulation("ALL.IN",55);
-	//mysimulation.get_ref_trans("myout_s.txt",'s');
-	//mysimulation.get_ref_trans("myout_p.txt",'p');
-	//mysimulation.get_psi_delta("psi_delta.txt");
+	simulation_ellip mysimulation("ALL2.IN",75);
+	mysimulation.get_ref_trans("myout_s.txt",'s');
+	mysimulation.get_ref_trans("myout_p.txt",'p');
+	mysimulation.get_psi_delta("psi_delta.txt");
 
 }
