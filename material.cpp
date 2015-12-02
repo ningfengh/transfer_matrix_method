@@ -38,6 +38,7 @@ complex<double> material_model::get_nk(double wav_in)
 		if (parameters.size()!=2) {cout<<"The Drude model should have two parameters"<<endl;exit(1);}
 		else return -parameters[0]/((1241.0/wav_in)*(1241.0/wav_in)+EYE*parameters[1]*1241.0/wav_in);
 	}
+        return 0;
 }
 
 material::material(string filename){
@@ -128,11 +129,12 @@ complex<double> material::get_nk(double wav_in){
 	}
 	else if (type==Model){
 		complex<double>eps(0.0,0.0);
-		for (int i=0;i<models.size();i++){
+		for (size_t i=0;i<models.size();i++){
 			eps+=models[i]->get_nk(wav_in);
 		}
 		return sqrt(eps);		
 	}
+	return 0;
 }
 
 

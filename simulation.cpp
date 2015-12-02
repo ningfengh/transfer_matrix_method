@@ -10,6 +10,7 @@ simulation::simulation(string filename)   // constructor from the control file
 	
 	if(m_file.is_open())
 	{
+
 		m_file>>wav_begin>>wav_end>>npoint;
 		this->wav_begin = wav_begin;
 		this->wav_end = wav_end;
@@ -21,32 +22,43 @@ simulation::simulation(string filename)   // constructor from the control file
 			wav_vector.push_back(wav_begin+(wav_end-wav_begin)/(npoint-1)*i);
 		}
 		
+//              Read material files
+
 		m_file>>n_material;
 		cout<<"number of materials is: "<<n_material<<endl;
 		for (int i=0;i<n_material;i++)
 		{
 			m_file>>datafilename;
-			material* temp=new material(datafilename);
+			material* temp=new material(datafilename); // class material constructer takes filename as an input
 			material_data.push_back(temp);
 		}
 
+//              Read layers info, the last layer is always semi-infinite substrate layer
+
 		m_file>>n_layer;
 		cout<<endl<<endl<<"number of layer is: "<<n_layer<<endl;
-		for (int i=0;i<n_layer;i++)
+		for (int i=0;i<n_layer-1;i++)
 		{
 			double idx,thickness;
 			m_file>>idx>>thickness;
-			layer* temp = new layer(idx,thickness);
+			layer* temp = new layer(idx,thickness);  // idx is material indice, thickness is the only parameter for each layer
 			layer_data.push_back(temp);
 			cout<<"layer "<<i+1<< " has the thickness of "<<thickness<<" nm and use the material data in "
 			<<material_data[idx-1]->file<<endl;
 		}
+		double idx,thickness;
+		m_file>>idx>>thickness;
+		if (thickness!=-1) {cout<<"last layer is semi-infinite, put thickness as -1\n"<<endl;exit(1);}
+		layer* temp = new layer(idx,thickness);
+		layer_data.push_back(temp);
+		cout<<"layer "<<n_layer<< " is semi-infinite substrate and use the material data in "
+		<<material_data[idx-1]->file<<endl;
 		m_file.close();
 	}
 	else {cout<<"Unable to open main control file ALL.IN"<<endl;}	
 }
 
-void simulation::get_ref_trans(string filename, char s)
+void simulation::get_ref_trans(string filename, char s)  // always have the last semi-infinite substrate layer
 {
 	if (layer_data.size()<1) {cout<<"please add more than one layer"<<endl;return;}
 	complex	<double> theta0 (aoi*M_PI/180.0,0.0);
@@ -99,21 +111,9 @@ void simulation::get_ref_trans(string filename, char s)
 				
 			}	
 		
-			/* calculate last layer */
-		
-			n1 = material_data[layer_data[nlayer-1]->idx]->get_nk(wav_vector[wav_idx]);
-			theta1 = asin(n0*sin(theta0)/n1);
-			complex <double> delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[nlayer-1]->thickness;		
-			rs = (n1*cos(theta1)-n0*cos(theta0))/(n1*cos(theta1)+n0*cos(theta0));
-			ts = (2.0*n1*cos(theta1))/(n1*cos(theta1)+n0*cos(theta0));
-		
-			tmp[0][0] = M[0][0]*exp(-EYE*delta)/ts+M[0][1]*exp(EYE*delta)*rs/ts;
-			tmp[0][1] = M[0][0]*exp(-EYE*delta)*rs/ts+M[0][1]*exp(EYE*delta)/ts;
-			tmp[1][0] = M[1][0]*exp(-EYE*delta)/ts+M[1][1]*exp(EYE*delta)*rs/ts;
-			tmp[1][1] = M[1][0]*exp(-EYE*delta)*rs/ts+M[1][1]*exp(EYE*delta)/ts;
-		
-			ref = tmp[1][0]/tmp[0][0];
-			trans = 1.0/tmp[0][0];
+					
+			ref = M[1][0]/M[0][0];
+			trans = 1.0/M[0][0];
 		
 			ref_vector_s.push_back(ref);
 			trans_vector_s.push_back(trans);
@@ -157,21 +157,9 @@ void simulation::get_ref_trans(string filename, char s)
 				
 			}	
 		
-			/* calculate last layer */
-		
-			n1 = material_data[layer_data[nlayer-1]->idx]->get_nk(wav_vector[wav_idx]);
-			theta1 = asin(n0*sin(theta0)/n1);
-			complex <double> delta = 2.0*M_PI/n0*n1*cos(theta1)/wav_vector[wav_idx]*layer_data[nlayer-1]->thickness;		
-			rs = (n1*cos(theta1)-n0*cos(theta0))/(n1*cos(theta1)+n0*cos(theta0));
-			ts = (2.0*n1*cos(theta1))/(n1*cos(theta1)+n0*cos(theta0));
-		
-			tmp[0][0] = M[0][0]*exp(-EYE*delta)/ts+M[0][1]*exp(EYE*delta)*rs/ts;
-			tmp[0][1] = M[0][0]*exp(-EYE*delta)*rs/ts+M[0][1]*exp(EYE*delta)/ts;
-			tmp[1][0] = M[1][0]*exp(-EYE*delta)/ts+M[1][1]*exp(EYE*delta)*rs/ts;
-			tmp[1][1] = M[1][0]*exp(-EYE*delta)*rs/ts+M[1][1]*exp(EYE*delta)/ts;
-		
-			ref = tmp[1][0]/tmp[0][0];
-			trans = 1.0/tmp[0][0];
+					
+			ref = M[1][0]/M[0][0];
+			trans = 1.0/M[0][0];
 		
 			ref_vector_p.push_back(ref);
 			trans_vector_p.push_back(trans);
