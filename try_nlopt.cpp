@@ -32,7 +32,7 @@ double myconstraint(const std::vector<double> &x, std::vector<double> &grad, voi
 
 int main(void)
 {
-	nlopt::opt opt(nlopt::LD_MMA, 2);
+	nlopt::opt opt(nlopt::LN_COBYLA, 2);
 
 	std::vector<double> lb(2);
 	lb[0] = -HUGE_VAL; lb[1] = 0;

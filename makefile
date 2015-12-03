@@ -5,7 +5,7 @@ CFLAGS=-c -std=c++11 -O3 -Wall
 all: tmm
 
 tmm: tmm_main.o ellipsometry.o simulation.o materail.o layer.o
-	$(CC) tmm_main.o ellipsometry.o simulation.o material.o layer.o -o tmm
+	$(CC) tmm_main.o ellipsometry.o simulation.o material.o layer.o -o tmm -lm -lnlopt
 
 tmm_main.o: tmm_main.cpp
 	$(CC) $(CFLAGS) tmm_main.cpp

@@ -113,7 +113,9 @@ double ellipsometry::myfunc(const std::vector<double> &x, std::vector<double> &g
 		fitted_data[i]->get_ref_trans('p');
 		fitted_data[i]->get_psi_delta();
 	}
-	return get_error();
+	double error = get_error();
+	//cout<<x[0]<<" "<<error<<endl;
+	return error;
 }
 
 
